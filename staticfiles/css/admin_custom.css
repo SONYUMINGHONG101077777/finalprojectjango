@@ -1,0 +1,25 @@
+/* Background color for header */
+#header {
+    background-color: #2979ff !important;  /* blue header */
+}
+
+/* Sidebar background */
+#nav-sidebar {
+    background-color: #004d40 !important;  /* dark green sidebar */
+}
+
+/* Change font color for links */
+#header .module {
+    color: #ffffff !important;
+}
+
+/* Table header background */
+table#result_list thead th {
+    background-color: #00bfa5 !important;
+    color: white !important;
+}
+
+/* Hover effect for rows */
+table#result_list tbody tr:hover {
+    background-color: #e0f2f1 !important;
+}

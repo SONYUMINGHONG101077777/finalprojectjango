@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Inventory System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+    body{
+        margin:0;
+        padding:0;
+        font-family:Arial, Helvetica, sans-serif;
+        background: linear-gradient(135deg, #2979ff, #00bfa5);
+        height:100vh;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+    .card{
+        background:white;
+        width:400px;
+        padding:40px;
+        border-radius:15px;
+        text-align:center;
+        box-shadow:0 10px 30px rgba(0,0,0,.15);
+        animation:fade .7s ease-in-out;
+    }
+    h2{
+        margin-bottom:10px;
+        color:#222;
+    }
+    p{
+        color:#666;
+    }
+    a{
+        display:inline-block;
+        padding:10px 20px;
+        border-radius:8px;
+        text-decoration:none;
+        margin:8px;
+        font-size:15px;
+    }
+    .btn-admin{
+        background:#3f51b5;
+        color:white;
+    }
+    .btn-api{
+        background:#00bfa5;
+        color:white;
+    }
+    .btn-admin:hover, .btn-api:hover{
+        opacity:.8;
+    }
+    @keyframes fade{
+        from{opacity:0; transform:translateY(10px);}
+        to{opacity:1; transform:translateY(0);}
+    }
+</style>
+
+</head>
+<body>
+    
+<div class="card">
+    <h2>Inventory Management System</h2>
+    <p>Manage Stock ・ Sales ・ Products</p><br>
+
+    <a href="/admin/" class="btn-admin">🔐 Admin Panel</a>
+    <a href="/api/" class="btn-api">💡 API Endpoints</a>
+</div>
+
+</body>
+</html>
