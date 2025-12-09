@@ -34,7 +34,7 @@ class StockHistory(models.Model):
         (OUT, "Stock Out"),
     ]
 
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)
     quantity = models.IntegerField()
     action_type = models.CharField(
         max_length=3,

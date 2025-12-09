@@ -4,24 +4,57 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Stock Overview</title>
+    <title>Dashboard</title>
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen py-10">
 
-<div class="max-w-3xl mx-auto">
-    <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
-        <h2 class="text-xl font-semibold mb-4 text-gray-700">
-            Stock Overview
-        </h2>
+<div class="max-w-3xl mx-auto space-y-10">
 
+    <!-- Add Product Form -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+        <h2 class="text-xl font-semibold mb-4 text-gray-700">Add Product</h2>
+
+        <form method="POST" action="{% url 'dashboard' %}">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-gray-600">Name:</label>
+                <input type="text" name="name" class="w-full border rounded px-3 py-2" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-600">Supplier:</label>
+                <select name="supplier" class="w-full border rounded px-3 py-2">
+                    {% for s in suppliers %}
+                        <option value="{{ s.id }}">{{ s.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-600">Stock:</label>
+                <input type="number" name="stock" class="w-full border rounded px-3 py-2" value="0">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-600">Minimum Stock:</label>
+                <input type="number" name="minimum_stock" class="w-full border rounded px-3 py-2" value="10">
+            </div>
+
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Add Product</button>
+        </form>
+    </div>
+
+    <!-- Stock Overview Chart -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+        <h2 class="text-xl font-semibold mb-4 text-gray-700">Stock Overview</h2>
         <canvas id="stockChart" class="w-full h-64"></canvas>
     </div>
+
 </div>
 
 <script>
-    // Data passed from Django
     const labels = {{ product_names|safe }};
     const data = {{ product_stocks|safe }};
 
@@ -32,8 +65,8 @@
             datasets: [{
                 label: "Stock Level",
                 data: data,
-                backgroundColor: "rgba(59, 130, 246, 0.6)",  // blue-500
-                borderColor: "rgba(37, 99, 235, 1)",          // blue-600
+                backgroundColor: "rgba(59, 130, 246, 0.6)",
+                borderColor: "rgba(37, 99, 235, 1)",
                 borderWidth: 1,
                 borderRadius: 6
             }]
@@ -41,15 +74,11 @@
         options: {
             responsive: true,
             scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: { color: "rgba(203, 213, 225, 0.4)" } // gray-300
-                },
+                y: { beginAtZero: true, grid: { color: "rgba(203, 213, 225, 0.4)" } },
                 x: { grid: { display: false } }
             }
         }
     });
 </script>
-
 </body>
 </html>

@@ -1,53 +1,11 @@
-/* inventory/static/inventory/css/admin_custom.css */
-
-/* Admin header */
-#header {
-    background-color: #e90ecc; /* Purple header */
-    color: white;
+/* Highlight "Low Stock" rows in ProductAdmin */
+td:contains("Low Stock") {
+    background-color: #ffcccc;
+    font-weight: bold;
 }
 
-/* Sidebar menu */
-#user-tools, #nav-global {
-    background-color: #a1e00c; /* Green sidebar */
-}
-
-/* Row in list_display tables */
-.model-product th, 
-.model-product td,
-.model-supplier th,
-.model-supplier td,
-.model-stockhistory th,
-.model-stockhistory td {
-    border-color: #ddd;
-}
-
-/* Hover effect for rows */
-tr:hover {
-    background-color: #f1f1f1;
-}
-
-/* Buttons */
-input[type="submit"], .button, .submit-row input {
-    background-color: #d10b4d;
-    color: white;
-    border-radius: 4px;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-}
-
-input[type="submit"]:hover, .button:hover, .submit-row input:hover {
-    background-color: #c10745;
-}
-
-/* Search box */
-#searchbar input[type="text"] {
-    border: 1px solid #ccc;
-    padding: 4px;
-    border-radius: 4px;
-}
-
-/* Change admin page font */
-body, th, td, input, select, textarea {
-    font-family: 'Arial', sans-serif;
+/* Table headers */
+th {
+    background-color: #f0f0f0;
+    font-weight: bold;
 }

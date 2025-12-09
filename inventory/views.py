@@ -1,26 +1,60 @@
+from django.shortcuts import render, redirect
+from django.db import transaction
+from django.core.mail import send_mail
+from .models import Product, Supplier, StockHistory
+
+# -----------------------------
+# Traditional Dashboard View
+# -----------------------------
+def dashboard(request):
+    suppliers = Supplier.objects.all()
+
+    if request.method == "POST":
+        name = request.POST.get("name")
+        supplier_id = request.POST.get("supplier")
+        stock = int(request.POST.get("stock") or 0)
+        minimum_stock = int(request.POST.get("minimum_stock") or 10)
+
+        with transaction.atomic():
+            Product.objects.create(
+                name=name,
+                supplier_id=supplier_id,
+                stock=stock,
+                minimum_stock=minimum_stock
+            )
+
+        return redirect('dashboard')
+
+    product_names = list(Product.objects.values_list("name", flat=True))
+    product_stocks = list(Product.objects.values_list("stock", flat=True))
+
+    context = {
+        "suppliers": suppliers,
+        "product_names": product_names,
+        "product_stocks": product_stocks,
+    }
+    return render(request, "dashboard.html", context)
+
+
+# -----------------------------
+# DRF API ViewSets
+# -----------------------------
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.db import transaction
-from django.core.mail import send_mail
 import threading
-
-from .models import Product, Supplier, StockHistory
 from .serializers import ProductSerializer, SupplierSerializer, StockHistorySerializer, StockActionSerializer
 
 class ProductViewSet(viewsets.ModelViewSet):
-    """CRUD + Stock management"""
-    
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
-    # ----- ADD STOCK -----
     @action(detail=True, methods=["POST"])
     def add_stock(self, request, pk=None):
         product = self.get_object()
         serializer = StockActionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        quantity = serializer.validated_data['quantity']
+        quantity = serializer.validated_data["quantity"]
 
         with transaction.atomic():
             product.stock += quantity
@@ -31,15 +65,14 @@ class ProductViewSet(viewsets.ModelViewSet):
             "message": "Stock added successfully",
             "product": product.name,
             "new_stock": product.stock
-        }, status=status.HTTP_200_OK)
+        })
 
-    # ----- REMOVE STOCK -----
     @action(detail=True, methods=["POST"])
     def remove_stock(self, request, pk=None):
         product = self.get_object()
         serializer = StockActionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        quantity = serializer.validated_data['quantity']
+        quantity = serializer.validated_data["quantity"]
 
         if quantity > product.stock:
             return Response({"error": "Not enough stock"}, status=status.HTTP_400_BAD_REQUEST)
@@ -49,30 +82,30 @@ class ProductViewSet(viewsets.ModelViewSet):
             product.save()
             StockHistory.objects.create(product=product, quantity=quantity, action_type="OUT")
 
-        # ----- Send low stock alert asynchronously -----
+        # Low stock email alert
         if product.stock < product.minimum_stock:
-            threading.Thread(target=send_mail, kwargs={
-                "subject": "Low Stock Alert",
-                "message": f"Product: {product.name} is low. Remaining: {product.stock}",
-                "from_email": "admin@example.com",
-                "recipient_list": ["owner@example.com"],
-                "fail_silently": True,
-            }).start()
+            threading.Thread(
+                target=lambda: send_mail(
+                    "Low Stock Alert",
+                    f"Product {product.name} is low (stock: {product.stock})",
+                    "admin@example.com",
+                    ["owner@example.com"]
+                ),
+                daemon=True
+            ).start()
 
         return Response({
-            "message": "Stock removed",
+            "message": "Stock removed successfully",
             "product": product.name,
             "new_stock": product.stock
-        }, status=status.HTTP_200_OK)
+        })
 
 
-# -------- Supplier View ---------
 class SupplierViewSet(viewsets.ModelViewSet):
     queryset = Supplier.objects.all()
     serializer_class = SupplierSerializer
 
 
-# -------- Stock History View ---------
 class StockHistoryViewSet(viewsets.ModelViewSet):
     queryset = StockHistory.objects.all()
     serializer_class = StockHistorySerializer
